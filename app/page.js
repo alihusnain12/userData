@@ -1,101 +1,93 @@
-import Image from "next/image";
+'use client';
+import Image from 'next/image';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import pic from '../app/public/assets/code.png';
 
-export default function Home() {
+const Page = () => {
+  const [countryCode, setCountryCode] = useState('+1');
+  const [phone, setPhone] = useState('');
+  const [zip, setZip] = useState('');
+  const router = useRouter();
+
+  const handlePhoneChange = (e) => {
+    const value = e.target.value;
+    // Ensure only numbers are entered
+    const regex = /^[0-9]*$/;
+    if (regex.test(value)) {
+      setPhone(value);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (phone && zip) {
+      router.push("/details");
+    } else {
+      alert("Please fill in all fields.");
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+    <div className='w-screen h-screen flex items-center justify-center bg-gray-100'>
+      <div className='relative w-full h-full'>
         <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+          src={pic}
+          alt='Code Image'
+          layout='fill'
+          objectFit='cover'
+          className='w-full h-full'
         />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        <div className='absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-r from-black/60 to-transparent'>
+          <form className='bg-white/30 backdrop-blur-md p-8 rounded-lg shadow-lg max-w-sm w-full' onSubmit={handleSubmit}>
+            <h2 className='text-2xl font-bold mb-6 text-white text-center'>Contact Us</h2>
+            <div className='mb-4'>
+              <label htmlFor='countryCode' className='block text-white text-sm font-bold mb-2'>Country Code</label>
+              <select
+                id='countryCode'
+                value={countryCode}
+                className='block w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400'
+                onChange={(e) => setCountryCode(e.target.value)}
+              >
+                <option value='+1'>+1 (USA)</option>
+                <option value='+44'>+44 (UK)</option>
+                <option value='+91'>+91 (India)</option>
+                <option value='+81'>+81 (Japan)</option>
+                <option value='+61'>+61 (Australia)</option>
+                <option value='+92'>+92 (Pakistan)</option>
+                {/* Add more options as needed */}
+              </select>
+            </div>
+            <div className='mb-4'>
+              <label htmlFor='phone' className='block text-white text-sm font-bold mb-2'>Phone Number</label>
+              <input
+                type='tel'
+                id='phone'
+                value={phone}
+                onChange={handlePhoneChange}
+                className='block w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400'
+                placeholder='Enter phone number'
+              />
+            </div>
+            <div className='mb-4'>
+              <label htmlFor='zipcode' className='block text-white text-sm font-bold mb-2'>Zipcode</label>
+              <input
+                type='text'
+                id='zipcode'
+                value={zip}
+                onChange={(e) => setZip(e.target.value)}
+                className='block w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400'
+                placeholder='Enter your zipcode'
+              />
+            </div>
+            <button type='submit' className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400'>
+              Submit
+            </button>
+          </form>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
     </div>
   );
-}
+};
+
+export default Page;
