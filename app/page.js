@@ -1,93 +1,99 @@
+
 'use client';
-import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { db } from '../firebase'
+import { collection, getDocs } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
-import pic from '../app/public/assets/code.png';
 
-const Page = () => {
-  const [countryCode, setCountryCode] = useState('+1');
-  const [phone, setPhone] = useState('');
-  const [zip, setZip] = useState('');
-  const router = useRouter();
+const Messages = () => {
+  const [messages, setMessages] = useState([]);
+  const [search, setSearch] = useState('');
+  const [filteredMessages, setFilteredMessages] = useState([]);
+  const router=useRouter()
+  useEffect(() => {
+    const fetchMessages = async () => {
+      const querySnapshot = await getDocs(collection(db, 'messages'));
+      const messagesArray = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setMessages(messagesArray);
+      setFilteredMessages(messagesArray);
+    };
 
-  const handlePhoneChange = (e) => {
-    const value = e.target.value;
-    // Ensure only numbers are entered
-    const regex = /^[0-9]*$/;
-    if (regex.test(value)) {
-      setPhone(value);
-    }
-  };
+    fetchMessages();
+  }, []);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (phone && zip) {
-      router.push("/details");
-    } else {
-      alert("Please fill in all fields.");
-    }
-  };
+  useEffect(() => {
+    
+    setFilteredMessages(
+      messages.filter((message) =>
+        message.zip.toLowerCase().includes(search.toLowerCase())
+      )
+    );
+  }, [search, messages]);
 
+
+
+  const signupPage=()=>{
+    router.push("/signup")
+  }
+
+
+  const messagePage=()=>{
+    router.push("/details")
+  }
+  const complainPage=()=>{
+    router.push("/complain")
+  }
   return (
-    <div className='w-screen h-screen flex items-center justify-center bg-gray-100'>
-      <div className='relative w-full h-full'>
-        <Image
-          src={pic}
-          alt='Code Image'
-          layout='fill'
-          objectFit='cover'
-          className='w-full h-full'
+    <div className='min-h-screen bg-gradient-to-r from-purple-600 to-blue-500 p-4'>
+
+       <div className="flex justify-between items-center mb-6">
+        <button onClick={messagePage} className=" bg-blue-500 text-white p-2 rounded-lg shadow hover:bg-blue-700 focus:outline-none">Message</button>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by Country Code"
+          className=" mx-auto my-4 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
-        <div className='absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-r from-black/60 to-transparent'>
-          <form className='bg-white/30 backdrop-blur-md p-8 rounded-lg shadow-lg max-w-sm w-full' onSubmit={handleSubmit}>
-            <h2 className='text-2xl font-bold mb-6 text-white text-center'>Contact Us</h2>
-            <div className='mb-4'>
-              <label htmlFor='countryCode' className='block text-white text-sm font-bold mb-2'>Country Code</label>
-              <select
-                id='countryCode'
-                value={countryCode}
-                className='block w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400'
-                onChange={(e) => setCountryCode(e.target.value)}
-              >
-                <option value='+1'>+1 (USA)</option>
-                <option value='+44'>+44 (UK)</option>
-                <option value='+91'>+91 (India)</option>
-                <option value='+81'>+81 (Japan)</option>
-                <option value='+61'>+61 (Australia)</option>
-                <option value='+92'>+92 (Pakistan)</option>
-                {/* Add more options as needed */}
-              </select>
-            </div>
-            <div className='mb-4'>
-              <label htmlFor='phone' className='block text-white text-sm font-bold mb-2'>Phone Number</label>
-              <input
-                type='tel'
-                id='phone'
-                value={phone}
-                onChange={handlePhoneChange}
-                className='block w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400'
-                placeholder='Enter phone number'
-              />
-            </div>
-            <div className='mb-4'>
-              <label htmlFor='zipcode' className='block text-white text-sm font-bold mb-2'>Zipcode</label>
-              <input
-                type='text'
-                id='zipcode'
-                value={zip}
-                onChange={(e) => setZip(e.target.value)}
-                className='block w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400'
-                placeholder='Enter your zipcode'
-              />
-            </div>
-            <button type='submit' className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400'>
-              Submit
-            </button>
-          </form>
-        </div>
+        <button onClick={signupPage} className=" bg-[#f70303] text-white p-2 rounded-lg shadow hover:bg-red-600 focus:outline-none border-2 border-white">Subscribe</button>
       </div>
+
+    <div className="flex flex-col items-center justify-center ">
+     
+      <div className="bg-gradient-to-r from-purple-600 to-blue-500 p-8 rounded-2xl shadow-2xl max-w-2xl w-full h-full overflow-y-auto custom-scrollbar">
+        {filteredMessages.length > 0 ? (
+          filteredMessages.map((message) => (
+            <div key={message.id} className="mb-6 p-6 bg-gray-100 rounded-lg shadow-inner max-h-40 ">
+              <div className="mb-2">
+                <span className="font-bold text-gray-700">Country Code: </span>
+                <span className="text-gray-900">{message.zip}</span>
+              </div>
+              <div className="mb-2">
+                <span className="font-bold text-gray-700">Message: </span>
+                <span className="text-gray-900">{message.message}</span>
+              </div>
+             
+              {/* <div>
+                <span className="font-bold text-gray-700">Time: </span>
+                <span className="text-gray-900">{new Date(message.timestamp.seconds * 1000).toLocaleString()}</span>
+              </div> */}
+            </div>
+          ))
+        ) : (
+          <p className="text-xl text-center text-gray-700">No messages found.</p>
+        )}
+      </div>
+    </div>
+    {/* detail button */}
+  <div>
+  <button onClick={complainPage} className=" bg-[#f7f5f5] text-black p-2 rounded-lg shadow hover:bg-purple-600 focus:outline-none border-2 border-white fixed bottom-5 right-3">Complain</button>
+
+  </div>
     </div>
   );
 };
 
-export default Page;
+export default Messages;
