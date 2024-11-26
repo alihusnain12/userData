@@ -76,10 +76,10 @@ const Messages = () => {
                 <span className="text-gray-900">{message.message}</span>
               </div>
              
-              {/* <div>
-                <span className="font-bold text-gray-700">Time: </span>
+              <div>
+                <span className="font-bold text-green-700">Time: </span>
                 <span className="text-gray-900">{new Date(message.timestamp.seconds * 1000).toLocaleString()}</span>
-              </div> */}
+              </div>
             </div>
           ))
         ) : (
